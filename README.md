@@ -1,289 +1,234 @@
-# cenakovinrakson
-Cene kovin
 <!DOCTYPE html>
 <html lang="sl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trenutna Cena Plemenitih Kovin | Zlato, Srebro, Platina</title>
-    <meta name="description" content="Preverite aktualne cene plemenitih kovin na gram, unčo, 100g in kilogram. Vgrajen kalkulator za odkup zlata in grafi gibanja cen.">
-    <!-- Tailwind CSS za sodoben dizajn -->
-    <script src="https://jsdelivr.net"></script>
-    <!-- Chart.js za napredne grafe -->
-    <script src="https://jsdelivr.net"></script>
+    <title>Spremljanje borznih cen & Kalkulator</title>
+    
     <style>
-        .modal { transition: opacity 0.25s ease; }
-        body.modal-active { overflow: hidden; }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            max-width: 500px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .info-text {
+            text-align: center;
+            color: #b3b3b3;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .status-box {
+            font-size: 0.85rem;
+            color: #f1c40f;
+            margin-bottom: 10px;
+        }
+
+        .card {
+            background-color: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 20px;
+            width: 100%;
+            box-sizing: border-box;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        h2 {
+            margin-top: 0;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+
+        .gold-title { color: #f1c40f; }
+        .silver-title { color: #bdc3c7; }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px dashed #2c2c2c;
+        }
+        .price-row:last-child { border-bottom: none; }
+
+        .price-value {
+            font-weight: bold;
+            color: #2ecc71;
+        }
+
+        /* Stil za kalkulator spodaj */
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.9rem; color: #ccc;}
+        select, input {
+            width: 100%; padding: 10px; background-color: #2c2c2c; border: 1px solid #444;
+            border-radius: 6px; box-sizing: border-box; color: #fff; font-size: 1rem;
+        }
+        button {
+            width: 100%; padding: 12px; background-color: #f1c40f; color: #121212;
+            border: none; border-radius: 6px; font-size: 1rem; cursor: pointer; font-weight: bold;
+        }
+        button:hover { background-color: #f39c12; }
+        .result-box {
+            margin-top: 15px; padding: 15px; background-color: #1a252f;
+            border-left: 4px solid #f1c40f; border-radius: 4px; display: none;
+        }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans flex flex-col min-h-screen justify-between">
+<body>
 
-    <!-- NAVIGACIJA -->
-    <header class="bg-white shadow-sm sticky top-0 z-50">
-        <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <a href="#" class="text-2xl font-bold text-amber-600 flex items-center gap-2">
-                🪙 KovineUra.si
-            </a>
-            <nav class="flex flex-wrap gap-4 sm:gap-6 text-sm font-medium text-gray-600 justify-center">
-                <a href="#tecaji" class="hover:text-amber-600 transition">Trenutni Tečaji</a>
-                <a href="#kalkulator" class="hover:text-amber-600 transition">Odkupni Kalkulator</a>
-                <a href="#grafi" class="hover:text-amber-600 transition">Zgodovinski Graf</a>
-                <a href="#o-kovinah" class="hover:text-amber-600 transition">O kovinah</a>
-                <a href="#kontakt" class="hover:text-amber-600 transition">Kontakt</a>
-            </nav>
-        </div>
-    </header>
+<main>
+    <p class="info-text">
+        Spremljajte svetovne borzne cene za Zlato in Srebro. 
+        Podatki se osvežujejo glede na svetovne borze.
+    </p>
+    
+    <div class="status-box" id="status-update">Zadnja posodobitev: Osveževanje...</div>
 
-    <!-- ADSENSE REKLAMA VRH -->
-    <div class="max-w-6xl mx-auto w-full px-4 mt-6 text-center">
-        <div class="bg-gray-200 py-4 text-xs text-gray-500 rounded border border-dashed border-gray-400">
-            [PROSTOR ZA ADSENSE OGLAS - Vrh strani]
-            <!-- <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXX" data-ad-slot="XXXXX" data-ad-format="auto"></ins> -->
-        </div>
+    <!-- KARTICA ZA ZLATO -->
+    <div class="card">
+        <h2 class="gold-title">✨ Zlato (Gold)</h2>
+        <div class="price-row"><span>1 Gram</span><span class="price-value" id="gold-g">- €</span></div>
+        <div class="price-row"><span>1 Trojanska unča (oz)</span><span class="price-value" id="gold-oz">- €</span></div>
+        <div class="price-row"><span>100 Gramov</span><span class="price-value" id="gold-100g">- €</span></div>
+        <div class="price-row"><span>1 Kilogram (kg)</span><span class="price-value" id="gold-kg">- €</span></div>
     </div>
 
-    <!-- GLAVNA VSEBINA -->
-    <main class="max-w-6xl mx-auto w-full px-4 py-8 flex-grow">
-        
-        <!-- UVOD IN CAS -->
-        <div class="text-center mb-10">
-            <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-2">Aktualne Cene Plemenitih Kovin v EUR</h1>
-            <p class="text-gray-600 max-w-2xl mx-auto">Spremljajte svetovne borzne cene za Zlato, Srebro in Platino. Podatki se osvežujejo glede na svetovne borze.</p>
-            <div class="mt-4 inline-flex items-center gap-2 text-xs bg-amber-50 text-amber-800 px-3 py-1.5 rounded-full font-medium">
-                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                Zadnja posodobitev: <span id="update-time">Osveževanje...</span>
-            </div>
-        </div>
-
-        <!-- PRIKAZ CEN (KARTICE) -->
-        <section id="tecaji" class="grid md:grid-cols-3 gap-6 mb-12">
-            <!-- ZLATO -->
-            <div class="bg-white rounded-2xl shadow-md border border-amber-100 overflow-hidden">
-                <div class="bg-amber-500 text-white px-6 py-4 font-bold text-xl flex justify-between items-center">
-                    <span>Zlato (Gold)</span>
-                    <span class="text-2xl">✨</span>
-                </div>
-                <div class="p-6 divide-y divide-gray-100">
-                    <div class="py-3 flex justify-between">
-                        <span class="text-gray-500">1 Gram</span>
-                        <span class="font-bold text-gray-900" id="gold-gram">- €</span>
-                    </div>
-                    <div class="py-3 flex justify-between">
-                        <span class="text-gray-500">1 Trojanska unča (oz)</span>
-                        <span class="font-bold text-gray-900" id="gold-ounce">- €</span>
-                    </div>
-                    <div class="py-3 flex justify-between">
-                        <span class="text-gray-500">100 Gramov</span>
-                        <span class="font-bold text-gray-900" id="gold-100g">- €</span>
-                    </div>
-                    <div class="py-3 flex justify-between">
-                        <span class="text-gray-500">1 Kilogram (kg)</span>
-                        <span class="font-bold text-gray-900" id="gold-kg">- €</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- SREBRO -->
-            <div class="bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden">
-                <div class="bg-slate-400 text-white px-6 py-4 font-bold text-xl flex justify-between items-center">
-                    <span>Srebro (Silver)</span>
-                    <span class="text-2xl">🪙</span>
-                </div>
-                <div class="p-6 divide-y divide-gray-100">
-                    <div class="py-3 flex justify-between">
-                        <span class="text-gray-500">1 Gram</span>
-                        <span class="font-bold text-gray-900" id="silver-gram">- €</span>
-                    </div>
-                    <div class="py-3 flex justify-between">
-                        <span class="text-gray-500">1 Trojanska unča (oz)</span>
-                        <span class="font-bold text-gray-900" id="silver-ounce">- €</span>
-                    </div>
-                    <div class="py-3 flex justify-between">
-                        <span class="text-gray-500">100 Gramov</span>
-                        <span class="font-bold text-gray-900" id="silver-100g">- €</span>
-                    </div>
-                    <div class="py-3 flex justify-between">
-                        <span class="text-gray-500">1 Kilogram (kg)</span>
-                        <span class="font-bold text-gray-900" id="silver-kg">- €</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PLATINA -->
-            <div class="bg-white rounded-2xl shadow-md border border-teal-100 overflow-hidden">
-                <div class="bg-teal-600 text-white px-6 py-4 font-bold text-xl flex justify-between items-center">
-                    <span>Platina (Platinum)</span>
-                    <span class="text-2xl">💿</span>
-                </div>
-                <div class="p-6 divide-y divide-gray-100">
-                    <div class="py-3 flex justify-between">
-                        <span class="text-gray-500">1 Gram</span>
-                        <span class="font-bold text-gray-900" id="plat-gram">- €</span>
-                    </div>
-                    <div class="py-3 flex justify-between">
-                        <span class="text-gray-500">1 Trojanska unča (oz)</span>
-                        <span class="font-bold text-gray-900" id="plat-ounce">- €</span>
-                    </div>
-                    <div class="py-3 flex justify-between">
-                        <span class="text-gray-500">100 Gramov</span>
-                        <span class="font-bold text-gray-900" id="plat-100g">- €</span>
-                    </div>
-                    <div class="py-3 flex justify-between">
-                        <span class="text-gray-500">1 Kilogram (kg)</span>
-                        <span class="font-bold text-gray-900" id="plat-kg">- €</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ADSENSE REKLAMA SREDA -->
-        <div class="w-full text-center mb-12">
-            <div class="bg-gray-200 py-4 text-xs text-gray-500 rounded border border-dashed border-gray-400">
-                [PROSTOR ZA ADSENSE OGLAS - Sredina strani]
-            </div>
-        </div>
-
-        <!-- KALKULATOR ZA OTKUP Z MARŽO -->
-        <section id="kalkulator" class="bg-white p-6 md:p-8 rounded-2xl shadow-md border border-gray-100 mb-12">
-            <h2 class="text-2xl font-bold text-gray-950 mb-2">🧮 Pametni kalkulator odkupne vrednosti</h2>
-            <p class="text-sm text-gray-500 mb-6">Izračunajte informativno odkupno vrednost. Vključena je vaša prilagodljiva marža portala.</p>
-            <div class="grid md:grid-cols-4 gap-4 items-end">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Izberi kovino</label>
-                    <select id="calc-metal" class="w-full border border-gray-300 rounded-lg p-2.5 bg-gray-50 focus:ring-2 focus:ring-amber-500">
-                        <option value="gold">Zlato</option>
-                        <option value="silver">Srebro</option>
-                        <option value="platinum">Platina</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Količina</label>
-                    <input type="number" id="calc-amount" value="1" min="0.01" step="any" class="w-full border border-gray-300 rounded-lg p-2.5 bg-gray-50 focus:ring-2 focus:ring-amber-500">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Enota</label>
-                    <select id="calc-unit" class="w-full border border-gray-300 rounded-lg p-2.5 bg-gray-50 focus:ring-2 focus:ring-amber-500">
-                        <option value="gram">Gram (g)</option>
-                        <option value="ounce">Trojanska unča (oz)</option>
-                        <option value="100g">100 Gramov</option>
-                        <option value="kg">Kilogram (kg)</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Vaša marža odkupa (%)</label>
-                    
-            </div>
-        </section>
-
-    </main>
-
-    <!-- NOGA STRANI -->
-    <footer class="bg-white border-t border-gray-200 mt-12 py-6">
-        <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500">
-            <div>
-                &copy; 2026 KovineUra. Vse pravice pridržane. Podatki so informativne narave.
-            </div>
-            <div class="flex gap-4 font-medium">
-                <button onclick="toggleModal('privacy-modal')" class="hover:underline cursor-pointer">Politika zasebnosti</button>
-                <button onclick="toggleModal('terms-modal')" class="hover:underline cursor-pointer">Pogoji poslovanja</button>
-                <button onclick="toggleModal('disclaimer-modal')" class="hover:underline cursor-pointer">Pravno obvestilo</button>
-            </div>
-        </div>
-    </footer>
-
-    <!-- MODALNA OKNA -->
-    <div id="privacy-modal" class="modal opacity-0 pointer-events-none fixed w-full h-full top-0 left-0 flex items-center justify-center z-50">
-        <div class="modal-overlay absolute w-full h-full bg-gray-900/50 backdrop-blur-xs"></div>
-        <div class="modal-container bg-white w-11/12 md:max-w-xl mx-auto rounded-xl shadow-lg z-50 overflow-y-auto max-h-[80vh] p-6">
-            <h3 class="text-xl font-bold mb-4">Politika zasebnosti in piškotki</h3>
-            <div class="text-sm text-gray-600 space-y-3">
-                <p>Na tej spletni strani spoštujemo vašo zasebnost. Stran uporablja Google AdSense za prikazovanje oglasov.</p>
-            </div>
-            <button onclick="toggleModal('privacy-modal')" class="mt-6 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-800 cursor-pointer">Zapri</button>
-        </div>
+    <!-- KARTICA ZA SREBRO -->
+    <div class="card">
+        <h2 class="silver-title">🪙 Srebro (Silver)</h2>
+        <div class="price-row"><span>1 Gram</span><span class="price-value" id="silver-g">- €</span></div>
+        <div class="price-row"><span>1 Trojanska unča (oz)</span><span class="price-value" id="silver-oz">- €</span></div>
+        <div class="price-row"><span>100 Gramov</span><span class="price-value" id="silver-100g">- €</span></div>
     </div>
 
-    <!-- JAVASCRIPT IN LOGIKA -->
-    <script>
-        const API_KEY = 'goldapi-30f777ec0212ee9a251d9fe7f67af070-io'; 
+    <!-- KALKULATOR ODKUPA -->
+    <div class="card">
+        <h2 style="color: #3498db;">📊 Pametni kalkulator</h2>
+        <div class="form-group">
+            <label>Izberi kovino:</label>
+            <select id="calc-kovina">
+                <option value="gold">Zlato</option>
+                <option value="silver">Srebro</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Količina:</label>
+            <input type="number" id="calc-kolicina" value="1" min="0" step="any">
+        </div>
+        <div class="form-group">
+            <label>Enota:</label>
+            <select id="calc-enota">
+                <option value="oz">Trojanska unča (oz)</option>
+                <option value="g">Gram (g)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Vaša marža odkupa (%):</label>
+            <input type="number" id="calc-marza" value="0" min="0" max="100" step="0.1">
+        </div>
+        <button id="calc-gumb">Izračunaj vrednost</button>
+        <div id="calc-rezultat" class="result-box"></div>
+    </div>
+</main>
+
+<script>
+    // Globalni spremenljivki za shranjevanje pridobljenih cen (za unčo v EUR)
+    let trenutnaCenaZlatoOz = 2320.50; // Privzeta varnostna vrednost
+    let trenutnaCenaSrebroOz = 28.40;   // Privzeta varnostna vrednost
+
+    async function osveziBorzneCene() {
+        const statusDiv = document.getElementById("status-update");
         
-        let pricesInOunce = { gold: 2380.45, silver: 28.90, platinum: 945.20 };
-
-        function calculateUnits(ouncePrice) {
-            const gram = ouncePrice / 31.1034768;
-            return { ounce: ouncePrice, gram: gram, g100: gram * 100, kg: gram * 1000 };
-        }
-
-        function updateUI() {
-            const gold = calculateUnits(pricesInOunce.gold);
-            const silver = calculateUnits(pricesInOunce.silver);
-            const platinum = calculateUnits(pricesInOunce.platinum);
-
-            document.getElementById('gold-gram').innerText = gold.gram.toFixed(2) + ' €';
-            document.getElementById('gold-ounce').innerText = gold.ounce.toFixed(2) + ' €';
-            document.getElementById('gold-100g').innerText = gold.g100.toFixed(2) + ' €';
-            document.getElementById('gold-kg').innerText = gold.kg.toLocaleString('sl-SI') + ' €';
-
-            document.getElementById('silver-gram').innerText = silver.gram.toFixed(2) + ' €';
-            document.getElementById('silver-ounce').innerText = silver.ounce.toFixed(2) + ' €';
-            document.getElementById('silver-100g').innerText = silver.g100.toFixed(2) + ' €';
-            document.getElementById('silver-kg').innerText = silver.kg.toLocaleString('sl-SI') + ' €';
-
-            document.getElementById('plat-gram').innerText = platinum.gram.toFixed(2) + ' €';
-            document.getElementById('plat-ounce').innerText = platinum.ounce.toFixed(2) + ' €';
-            document.getElementById('plat-100g').innerText = platinum.g100.toFixed(2) + ' €';
-            document.getElementById('plat-kg').innerText = platinum.kg.toLocaleString('sl-SI') + ' €';
-
-            const sedaj = new Date();
-            document.getElementById('update-time').innerText = sedaj.toLocaleDateString('sl-SI') + ' ob ' + sedaj.toLocaleTimeString('sl-SI');
-            runCalculator();
-        }
-
-        async function fetchLivePrices() {
-            if(!API_KEY || API_KEY === 'goldapi-30f777ec0212ee9a251d9fe7f67af070-io') {
-                updateUI();
-                return;
+        try {
+            // Uporabimo zanesljiv javni API za osveževanje valut in kovin
+            const response = await fetch("https://er-api.com");
+            if (!response.ok) throw new Error("Napaka pri prenosu podatkov");
+            
+            const data = await response.json();
+            
+            // API vrne vrednost EUR glede na 1 unčo zlata (XAU) in srebra (XAG) iz obratnega razmerja
+            if (data.rates && data.rates.XAU && data.rates.XAG) {
+                trenutnaCenaZlatoOz = 1 / data.rates.XAU;
+                trenutnaCenaSrebroOz = 1 / data.rates.XAG;
+                
+                const zdaj = new Date();
+                statusDiv.innerText = `Zadnja posodobitev: ${zdaj.toLocaleTimeString('sl-SI')}`;
+            } else {
+                statusDiv.innerText = "Zadnja posodobitev: Uporabljeni offline podatki (osveževanje ni uspelo).";
             }
-            try {
-                const responseGold = await fetch('https://goldapi.io', { headers: { 'x-access-token': API_KEY } });
-                const dataGold = await responseGold.json();
-                if(dataGold.price) pricesInOunce.gold = dataGold.price;
-                updateUI();
-            } catch (error) {
-                console.error(error);
-                updateUI();
-            }
+        } catch (error) {
+            console.error("API Error:", error);
+            statusDiv.innerText = "Zadnja posodobitev: Način brez povezave (prikazane privzete cene).";
         }
 
-        function runCalculator() {
-            const metal = document.getElementById('calc-metal').value;
-            const amount = parseFloat(document.getElementById('calc-amount').value) || 0;
-            const unit = document.getElementById('calc-unit').value;
-            const marginPercent = parseFloat(document.getElementById('calc-margin').value) || 0;
+        PrikaziCeneNaStrani();
+    }
 
-            const units = calculateUnits(pricesInOunce[metal]);
-            let marketPrice = 0;
-            if(unit === 'gram') marketPrice = units.gram * amount;
-            if(unit === 'ounce') marketPrice = units.ounce * amount;
-            if(unit === '100g') marketPrice = units.g100 * amount;
-            if(unit === 'kg') marketPrice = units.kg * amount;
+    function PrikaziCeneNaStrani() {
+        // Izračuni za Zlato
+        const zlatoOz = trenutnaCenaZlatoOz;
+        const zlatoG = zlatoOz / 31.1035;
 
-            let finalPayout = marketPrice * (1 + (marginPercent / 100));
-            document.getElementById('calc-market-result').innerText = marketPrice.toLocaleString('sl-SI') + ' €';
-            document.getElementById('calc-result').innerText = finalPayout.toLocaleString('sl-SI') + ' €';
-        }
+        document.getElementById("gold-oz").innerText = `${zlatoOz.toFixed(2)} €`;
+        document.getElementById("gold-g").innerText = `${zlatoG.toFixed(2)} €`;
+        document.getElementById("gold-100g").innerText = `${(zlatoG * 100).toFixed(2)} €`;
+        document.getElementById("gold-kg").innerText = `${(zlatoG * 1000).toFixed(2)} €`;
 
-        document.getElementById('calc-metal').addEventListener('change', runCalculator);
-        document.getElementById('calc-amount').addEventListener('input', runCalculator);
-        document.getElementById('calc-unit').addEventListener('change', runCalculator);
-        document.getElementById('calc-margin').addEventListener('input', runCalculator);
+        // Izračuni za Srebro
+        const srebroOz = trenutnaCenaSrebroOz;
+        const srebroG = srebroOz / 31.1035;
 
-        function toggleModal(modalId) {
-            document.getElementById(modalId).classList.toggle('opacity-0');
-            document.getElementById(modalId).classList.toggle('pointer-events-none');
-        }
+        document.getElementById("silver-oz").innerText = `${srebroOz.toFixed(2)} €`;
+        document.getElementById("silver-g").innerText = `${srebroG.toFixed(2)} €`;
+        document.getElementById("silver-100g").innerText = `${(srebroG * 100).toFixed(2)} €`;
+    }
 
-        window.onload = function() { fetchLivePrices(); };
-    </script>
+    // Logika kalkulatorja
+    document.getElementById("calc-gumb").addEventListener("click", function() {
+        const kovina = document.getElementById("calc-kovina").value;
+        const kolicina = parseFloat(document.getElementById("calc-kolicina").value) || 0;
+        const enota = document.getElementById("calc-enota").value;
+        const marza = parseFloat(document.getElementById("calc-marza").value) || 0;
+        const rezultatDiv = document.getElementById("calc-rezultat");
+
+        let izbranaCenaOz = (kovina === "gold") ? trenutnaCenaZlatoOz : trenutnaCenaSrebroOz;
+        let cenaZaEnoto = (enota === "g") ? (izbranaCenaOz / 31.1035) : izbranaCenaOz;
+
+        let borznaVrednost = cenaZaEnoto * kolicina;
+        let končnaVrednost = borznaVrednost * (1 - (marza / 100));
+
+        rezultatDiv.style.display = "block";
+        rezultatDiv.innerHTML = `
+            <h3 style="margin-top:0; color:#f1c40f;">Izračun:</h3>
+            <p>Skupna borzna vrednost: <strong>${borznaVrednost.toFixed(2)} EUR</strong></p>
+            <p>Odkupna cena (z odšteto maržo): <strong style="color:#2ecc71; font-size:1.15em;">${končnaVrednost.toFixed(2)} EUR</strong></p>
+        `;
+    });
+
+    // Zagon ob nalaganju strani
+    document.addEventListener("DOMContentLoaded", osveziBorzneCene);
+</script>
+
 </body>
 </html>

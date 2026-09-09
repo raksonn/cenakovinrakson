@@ -240,7 +240,7 @@ Cene kovin
         }
 
         async function fetchLivePrices() {
-            if(!API_KEY || API_KEY === 'TUKAJ_VSTAVITE_VAS_API_KLJUC') {
+            if(!API_KEY || API_KEY === 'goldapi-30f777ec0212ee9a251d9fe7f67af070-io') {
                 updateUI();
                 return;
             }
